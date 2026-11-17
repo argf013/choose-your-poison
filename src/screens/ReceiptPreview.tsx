@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import {
   Printer,
   Download,
@@ -108,6 +108,31 @@ export const ReceiptPreview: React.FC = () => {
       setIsDownloading(false);
     }
   };
+
+  const hasAutoPrintedRef = useRef(false);
+
+  useEffect(() => {
+    if (!hasAutoPrintedRef.current) {
+      hasAutoPrintedRef.current = true;
+      handlePrint();
+    }
+
+    let resetTimer: ReturnType<typeof setTimeout> | undefined;
+    const feedbackTimer = setTimeout(() => {
+      setPrintFeedback({
+        type: "success",
+        text: "Berhasil! Terima kasih telah berpartisipasi. Kembali ke halaman awal...",
+      });
+      resetTimer = setTimeout(() => {
+        resetSession();
+      }, 1500);
+    }, 10000);
+
+    return () => {
+      clearTimeout(feedbackTimer);
+      if (resetTimer) clearTimeout(resetTimer);
+    };
+  }, []);
 
   const isPrinterReady = btStatus.isConnected || isRawBtReady;
 

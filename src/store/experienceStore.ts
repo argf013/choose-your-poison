@@ -31,7 +31,7 @@ const generateSessionId = (): string => {
 };
 
 export const useExperienceStore = create<ExperienceState>((set) => ({
-  currentStep: "welcome",
+  currentStep: "introduction",
   selectedExpressionIds: [],
   sessionId: generateSessionId(),
   sessionStartTime: Date.now(),
@@ -77,7 +77,7 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
 
   resetSession: () =>
     set({
-      currentStep: "welcome",
+      currentStep: "introduction",
       selectedExpressionIds: [],
       sessionId: generateSessionId(),
       sessionStartTime: Date.now(),

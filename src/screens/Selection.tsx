@@ -139,7 +139,7 @@ export const Selection: React.FC = () => {
           variant={count > 0 ? "primary" : "outline"}
           disabled={count === 0}
           icon={<ArrowRight size={18} />}
-          onClick={() => setStep("reflection")}
+          onClick={() => setStep("receipt")}
         >
           Review consequences
         </Button>
