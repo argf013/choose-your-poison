@@ -128,7 +128,7 @@ export const ReceiptPreview: React.FC = () => {
       resetTimer = setTimeout(() => {
         resetSession();
       }, 2000);
-    }, 10000);
+    }, 5000);
 
     return () => {
       clearTimeout(feedbackTimer);
