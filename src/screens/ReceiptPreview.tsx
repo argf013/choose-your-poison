@@ -39,6 +39,7 @@ export const ReceiptPreview: React.FC = () => {
 
   const [isDownloading, setIsDownloading] = useState(false);
   const [isPrinterModalOpen, setIsPrinterModalOpen] = useState(false);
+  const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
   const [btStatus, setBtStatus] = useState(getBluetoothPrinterStatus());
   const [isRawBtReady, setIsRawBtReady] = useState(false);
   const [printFeedback, setPrintFeedback] = useState<{
@@ -119,13 +120,14 @@ export const ReceiptPreview: React.FC = () => {
 
     let resetTimer: ReturnType<typeof setTimeout> | undefined;
     const feedbackTimer = setTimeout(() => {
+      setShowSuccessOverlay(true);
       setPrintFeedback({
         type: "success",
         text: "Berhasil! Terima kasih telah berpartisipasi. Kembali ke halaman awal...",
       });
       resetTimer = setTimeout(() => {
         resetSession();
-      }, 1500);
+      }, 2000);
     }, 10000);
 
     return () => {
@@ -138,6 +140,19 @@ export const ReceiptPreview: React.FC = () => {
 
   return (
     <div className="flex-1 w-full max-w-5xl mx-auto px-6 sm:px-12 py-10 flex flex-col justify-between overflow-y-auto">
+      {showSuccessOverlay && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6">
+          <div className="bg-[#FAF8F5] text-nordic-ink rounded-2xl p-8 max-w-sm w-full flex flex-col items-center text-center shadow-2xl space-y-4">
+            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+              <CheckCircle2 size={40} />
+            </div>
+            <h3 className="text-xl font-semibold">Selesai!</h3>
+            <p className="text-sm text-nordic-muted">
+              Terima kasih telah berpartisipasi. Kembali ke halaman awal...
+            </p>
+          </div>
+        </div>
+      )}
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-nordic-border/50">
         <div>
