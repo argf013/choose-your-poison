@@ -1,0 +1,81 @@
+@import "./print.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: #f7f5f0;
+    color: #1a1918;
+    font-family:
+      "Plus Jakarta Sans",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    overscroll-behavior: none;
+  }
+
+  .font-mono-receipt {
+    font-family: "Space Mono", "Courier New", Courier, monospace;
+  }
+
+  /* Clean Scandinavian aesthetic: no intrusive scrollbars */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(26, 25, 24, 0.1);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(26, 25, 24, 0.25);
+  }
+}
+
+/* Subtle, clean thermal paper borders */
+.receipt-sawtooth-top {
+  position: relative;
+}
+.receipt-sawtooth-top::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background-repeat: repeat-x;
+  background-size: 12px 6px;
+  background-image:
+    linear-gradient(135deg, transparent 6px, #ffffff 6px),
+    linear-gradient(225deg, transparent 6px, #ffffff 6px);
+}
+
+.receipt-sawtooth-bottom {
+  position: relative;
+}
+.receipt-sawtooth-bottom::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background-repeat: repeat-x;
+  background-size: 12px 6px;
+  background-image:
+    linear-gradient(45deg, transparent 6px, #ffffff 6px),
+    linear-gradient(315deg, transparent 6px, #ffffff 6px);
+}
