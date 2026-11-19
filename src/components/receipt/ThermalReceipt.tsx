@@ -107,11 +107,11 @@ export const ThermalReceipt: React.FC<ThermalReceiptProps> = ({
 
                 {/* Captured User Input */}
                 {item.id === "share-face" && receipt.expressionInputs?.facePhoto && (
-                  <div className="pl-3 mt-1.5">
+                  <div className="mt-2">
                     <img
                       src={receipt.expressionInputs.facePhoto}
                       alt="Captured face"
-                      className="w-24 h-24 object-cover grayscale contrast-125 border border-black/30"
+                      className="w-full h-auto object-cover grayscale contrast-125 border border-black/30"
                     />
                   </div>
                 )}
