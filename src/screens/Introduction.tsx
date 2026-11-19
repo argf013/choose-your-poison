@@ -56,7 +56,7 @@ export const Introduction: React.FC = () => {
             size="lg"
             variant="primary"
             icon={<ArrowRight size={18} />}
-            onClick={() => setStep("selection")}
+            onClick={() => setStep("social")}
           >
             Next
           </Button>

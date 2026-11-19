@@ -71,6 +71,12 @@ export const ThermalReceipt: React.FC<ThermalReceiptProps> = ({
           <span className="text-neutral-500">TIMESTAMP:</span>
           <span className="font-medium">{receipt.timestamp}</span>
         </div>
+        {receipt.selectedSocials && receipt.selectedSocials.length > 0 && (
+          <div className="flex justify-between items-start text-[10px] gap-2">
+            <span className="text-neutral-500 shrink-0">PLATFORMS:</span>
+            <span className="font-medium text-right">{receipt.selectedSocials.join(", ")}</span>
+          </div>
+        )}
       </div>
 
       {/* Divider */}
@@ -98,6 +104,52 @@ export const ThermalReceipt: React.FC<ThermalReceiptProps> = ({
                 <div className="text-[10px] text-neutral-700 pl-3 mt-0.5">
                   &gt; Risk: <span className="font-semibold">{item.primaryRisk}</span>
                 </div>
+
+                {/* Captured User Input */}
+                {item.id === "share-face" && receipt.expressionInputs?.facePhoto && (
+                  <div className="pl-3 mt-1.5">
+                    <img
+                      src={receipt.expressionInputs.facePhoto}
+                      alt="Captured face"
+                      className="w-24 h-24 object-cover grayscale contrast-125 border border-black/30"
+                    />
+                  </div>
+                )}
+                {item.id === "speak-mind" && receipt.expressionInputs?.mindText && (
+                  <div className="text-[10px] text-black pl-3 mt-1 border-l-2 border-black/30 ml-3">
+                    &ldquo;{receipt.expressionInputs.mindText}&rdquo;
+                  </div>
+                )}
+                {item.id === "share-location" && receipt.expressionInputs?.locationText && (
+                  <div className="text-[10px] text-black pl-3 mt-0.5 font-mono">
+                    &gt; Loc: {receipt.expressionInputs.locationText}
+                  </div>
+                )}
+                {item.id === "share-life" && receipt.expressionInputs?.lifeText && (
+                  <div className="text-[10px] text-black pl-3 mt-1 border-l-2 border-black/30 ml-3">
+                    &ldquo;{receipt.expressionInputs.lifeText}&rdquo;
+                  </div>
+                )}
+                {item.id === "share-identity" && receipt.expressionInputs?.identity && (
+                  <div className="text-[9px] text-black pl-3 mt-1 space-y-0.5">
+                    {receipt.expressionInputs.identity.name && (
+                      <div>&gt; Name: {receipt.expressionInputs.identity.name}</div>
+                    )}
+                    {receipt.expressionInputs.identity.birthPlaceDate && (
+                      <div>&gt; DOB: {receipt.expressionInputs.identity.birthPlaceDate}</div>
+                    )}
+                    {receipt.expressionInputs.identity.address && (
+                      <div>&gt; Addr: {receipt.expressionInputs.identity.address}</div>
+                    )}
+                    {receipt.expressionInputs.identity.school && (
+                      <div>&gt; School: {receipt.expressionInputs.identity.school}</div>
+                    )}
+                    {receipt.expressionInputs.identity.graduation && (
+                      <div>&gt; Grad: {receipt.expressionInputs.identity.graduation}</div>
+                    )}
+                  </div>
+                )}
+
                 <div className="text-[9px] text-neutral-500 italic pl-3 mt-0.5 leading-snug">
                   &ldquo;{item.consequenceQuote}&rdquo;
                 </div>

@@ -5,6 +5,7 @@ import { KioskHeader } from "./KioskHeader";
 import { KioskFooter } from "./KioskFooter";
 import { Welcome } from "../../screens/Welcome";
 import { Introduction } from "../../screens/Introduction";
+import { SocialSelection } from "../../screens/SocialSelection";
 import { Selection } from "../../screens/Selection";
 import { Reflection } from "../../screens/Reflection";
 import { ReceiptPreview } from "../../screens/ReceiptPreview";
@@ -17,7 +18,9 @@ export const KioskContainer: React.FC = () => {
   const {
     currentStep,
     setStep,
+    selectedSocials,
     selectedExpressionIds,
+    expressionInputs,
     sessionId,
     paperWidth,
     resetSession,
@@ -32,8 +35,15 @@ export const KioskContainer: React.FC = () => {
   );
 
   const receiptData = useMemo(
-    () => generateReceiptData(sessionId, selectedExpressions, paperWidth),
-    [sessionId, selectedExpressions, paperWidth]
+    () =>
+      generateReceiptData(
+        sessionId,
+        selectedExpressions,
+        paperWidth,
+        selectedSocials,
+        expressionInputs
+      ),
+    [sessionId, selectedExpressions, paperWidth, selectedSocials, expressionInputs]
   );
 
   // Keyboard navigation & kiosk shortcuts
@@ -92,6 +102,8 @@ export const KioskContainer: React.FC = () => {
         return <Welcome key="welcome" />;
       case "introduction":
         return <Introduction key="introduction" />;
+      case "social":
+        return <SocialSelection key="social" />;
       case "selection":
         return <Selection key="selection" />;
       case "reflection":

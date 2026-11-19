@@ -1,4 +1,4 @@
-import { ExpressionItem, ReceiptData } from "../types";
+import { ExpressionInputs, ExpressionItem, ReceiptData } from "../types";
 import { INSTALLATION_INFO } from "../data/expressions";
 
 export function formatInstallationDate(timestamp: number = Date.now()): {
@@ -38,7 +38,9 @@ export function formatInstallationDate(timestamp: number = Date.now()): {
 export function generateReceiptData(
   sessionId: string,
   selectedExpressions: ExpressionItem[],
-  paperWidth: "58mm" | "80mm" = "58mm"
+  paperWidth: "58mm" | "80mm" = "58mm",
+  selectedSocials: string[] = [],
+  expressionInputs: ExpressionInputs = {}
 ): ReceiptData {
   const { formatted, iso } = formatInstallationDate();
 
@@ -63,7 +65,9 @@ export function generateReceiptData(
     sessionId,
     timestamp: formatted,
     isoDate: iso,
+    selectedSocials,
     selectedExpressions,
+    expressionInputs,
     hiddenCosts,
     terminalLocation: INSTALLATION_INFO.location,
     paperWidth,

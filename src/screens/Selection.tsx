@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Camera, MessageSquare, MapPin, Heart, UserCheck, Check, ArrowRight } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { useExperienceStore } from "../store/experienceStore";
 import { EXPRESSIONS } from "../data/expressions";
 import { sounds } from "../utils/audio";
+import { ExpressionInputModal } from "../components/selection/ExpressionInputModal";
 
 const ICONS: Record<string, React.ReactNode> = {
   Camera: <Camera size={22} strokeWidth={1.5} />,
@@ -16,6 +17,7 @@ const ICONS: Record<string, React.ReactNode> = {
 export const Selection: React.FC = () => {
   const {
     selectedExpressionIds,
+    expressionInputs,
     toggleExpression,
     selectAllExpressions,
     clearSelections,
@@ -23,12 +25,36 @@ export const Selection: React.FC = () => {
     audioEnabled,
   } = useExperienceStore();
 
+  const [activeModalId, setActiveModalId] = useState<string | null>(null);
+
   const handleToggle = (id: string) => {
     const isCurrentlySelected = selectedExpressionIds.includes(id);
     if (audioEnabled) {
       sounds.playSelect(!isCurrentlySelected);
     }
     toggleExpression(id);
+    if (!isCurrentlySelected) {
+      setActiveModalId(id);
+    }
+  };
+
+  const hasInputFor = (id: string): boolean => {
+    if (id === "share-face") return Boolean(expressionInputs.facePhoto);
+    if (id === "speak-mind") return Boolean(expressionInputs.mindText);
+    if (id === "share-location") return Boolean(expressionInputs.locationText);
+    if (id === "share-life") return Boolean(expressionInputs.lifeText);
+    if (id === "share-identity") {
+      const idData = expressionInputs.identity;
+      return Boolean(
+        idData &&
+          (idData.name ||
+            idData.birthPlaceDate ||
+            idData.address ||
+            idData.school ||
+            idData.graduation)
+      );
+    }
+    return false;
   };
 
   const allIds = EXPRESSIONS.map((e) => e.id);
@@ -41,10 +67,10 @@ export const Selection: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-nordic-border/50">
         <div>
           <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-nordic-ink">
-            What are you willing to share?
+            Today&apos;s Special Menu
           </h2>
           <p className="text-sm sm:text-base text-nordic-muted mt-1.5 font-normal">
-            Every expression is a choice. Every choice has a consequence.
+            Please select your desired experience
           </p>
         </div>
 
@@ -122,6 +148,18 @@ export const Selection: React.FC = () => {
                 }`}
               >
                 <span>Risk: {item.primaryRisk}</span>
+                {isSelected && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveModalId(item.id);
+                    }}
+                    className="mt-2 block text-[11px] underline text-[#FAF8F5]/90 hover:text-white cursor-pointer"
+                  >
+                    {hasInputFor(item.id) ? "✓ Input saved (Edit)" : "Fill input →"}
+                  </button>
+                )}
               </div>
             </div>
           );
@@ -130,7 +168,7 @@ export const Selection: React.FC = () => {
 
       {/* Bottom Actions */}
       <div className="flex items-center justify-between pt-6 border-t border-nordic-border/50">
-        <Button size="md" variant="ghost" onClick={() => setStep("introduction")}>
+        <Button size="md" variant="ghost" onClick={() => setStep("social")}>
           ← Back
         </Button>
 
@@ -144,6 +182,11 @@ export const Selection: React.FC = () => {
           Review consequences
         </Button>
       </div>
+
+      <ExpressionInputModal
+        expressionId={activeModalId}
+        onClose={() => setActiveModalId(null)}
+      />
     </div>
   );
 };
