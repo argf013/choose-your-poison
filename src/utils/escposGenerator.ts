@@ -193,6 +193,79 @@ export class EscPosBuilder {
   }
 
   /**
+   * Convert a base64 image data URL into ESC/POS GS v 0 monochrome raster bitmap
+   */
+  async rasterImage(dataUrl: string): Promise<this> {
+    const maxDots = this.charsPerLine === 48 ? 576 : 384;
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+      image.src = dataUrl;
+    });
+
+    const targetWidth = Math.floor(maxDots / 8) * 8;
+    const targetHeight = Math.max(1, Math.round((img.height / img.width) * targetWidth));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return this;
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, targetWidth, targetHeight);
+    ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+    const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight);
+    const data = imageData.data;
+
+    // Grayscale buffer for Floyd-Steinberg dithering
+    const gray = new Float32Array(targetWidth * targetHeight);
+    for (let i = 0; i < targetWidth * targetHeight; i++) {
+      const r = data[i * 4];
+      const g = data[i * 4 + 1];
+      const b = data[i * 4 + 2];
+      gray[i] = 0.299 * r + 0.587 * g + 0.114 * b;
+    }
+
+    const bytesPerRow = targetWidth / 8;
+    const bitmapBytes: number[] = [];
+
+    for (let y = 0; y < targetHeight; y++) {
+      for (let bx = 0; bx < bytesPerRow; bx++) {
+        let byte = 0;
+        for (let bit = 0; bit < 8; bit++) {
+          const x = bx * 8 + bit;
+          const idx = y * targetWidth + x;
+          const oldPixel = gray[idx];
+          const newPixel = oldPixel < 128 ? 0 : 255;
+          if (newPixel === 0) {
+            byte |= 1 << (7 - bit);
+          }
+          const err = oldPixel - newPixel;
+          if (x + 1 < targetWidth) gray[idx + 1] += (err * 7) / 16;
+          if (y + 1 < targetHeight) {
+            if (x > 0) gray[idx + targetWidth - 1] += (err * 3) / 16;
+            gray[idx + targetWidth] += (err * 5) / 16;
+            if (x + 1 < targetWidth) gray[idx + targetWidth + 1] += (err * 1) / 16;
+          }
+        }
+        bitmapBytes.push(byte);
+      }
+    }
+
+    const xL = bytesPerRow & 0xff;
+    const xH = (bytesPerRow >> 8) & 0xff;
+    const yL = targetHeight & 0xff;
+    const yH = (targetHeight >> 8) & 0xff;
+
+    this.buffer.push(GS, 0x76, 0x30, 0x00, xL, xH, yL, yH, ...bitmapBytes);
+    this.buffer.push(LF);
+    return this;
+  }
+
+  /**
    * Get raw byte array
    */
   build(): Uint8Array {
@@ -203,7 +276,7 @@ export class EscPosBuilder {
 /**
  * Generate complete ESC/POS buffer from ReceiptData
  */
-export function generateEscPosReceipt(receipt: ReceiptData): Uint8Array {
+export async function generateEscPosReceipt(receipt: ReceiptData): Promise<Uint8Array> {
   const builder = new EscPosBuilder(receipt.paperWidth);
 
   builder
@@ -242,7 +315,7 @@ export function generateEscPosReceipt(receipt: ReceiptData): Uint8Array {
   if (receipt.selectedExpressions.length === 0) {
     builder.align("center").line("[ No expressions selected ]").align("left");
   } else {
-    receipt.selectedExpressions.forEach((item) => {
+    for (const item of receipt.selectedExpressions) {
       builder
         .feed(1)
         .bold(true)
@@ -251,7 +324,13 @@ export function generateEscPosReceipt(receipt: ReceiptData): Uint8Array {
         .wrappedText(`> Risk: ${item.primaryRisk}`, 2);
 
       if (item.id === "share-face" && receipt.expressionInputs?.facePhoto) {
-        builder.wrappedText("> [Face Photo Captured]", 2);
+        try {
+          builder.align("center");
+          await builder.rasterImage(receipt.expressionInputs.facePhoto);
+          builder.align("left");
+        } catch {
+          builder.wrappedText("> [Face Photo Captured]", 2);
+        }
       }
       if (item.id === "speak-mind" && receipt.expressionInputs?.mindText) {
         builder.wrappedText(`> "${receipt.expressionInputs.mindText}"`, 2);
@@ -272,7 +351,7 @@ export function generateEscPosReceipt(receipt: ReceiptData): Uint8Array {
       }
 
       builder.wrappedText(`"${item.consequenceQuote}"`, 2);
-    });
+    }
   }
 
   // Divider

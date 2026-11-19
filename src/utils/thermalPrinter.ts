@@ -55,7 +55,7 @@ export async function printThermalReceipt(
   receipt: ReceiptData,
   mode: PrintMode = getSavedPrintMode()
 ): Promise<PrintExecutionResult> {
-  const escposBytes = generateEscPosReceipt(receipt);
+  const escposBytes = await generateEscPosReceipt(receipt);
 
   // 1. Force Web Bluetooth
   if (mode === "bluetooth") {
