@@ -26,7 +26,9 @@ import {
 export const ReceiptPreview: React.FC = () => {
   const {
     sessionId,
+    selectedSocials,
     selectedExpressionIds,
+    expressionInputs,
     paperWidth,
     setPaperWidth,
     setStep,
@@ -58,8 +60,15 @@ export const ReceiptPreview: React.FC = () => {
   );
 
   const receiptData = useMemo(
-    () => generateReceiptData(sessionId, selectedExpressions, paperWidth),
-    [sessionId, selectedExpressions, paperWidth]
+    () =>
+      generateReceiptData(
+        sessionId,
+        selectedExpressions,
+        paperWidth,
+        selectedSocials,
+        expressionInputs
+      ),
+    [sessionId, selectedExpressions, paperWidth, selectedSocials, expressionInputs]
   );
 
   const handlePrint = async () => {
