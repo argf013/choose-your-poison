@@ -78,6 +78,18 @@ export function downloadReceiptImage(receipt: ReceiptData): Promise<void> {
     ctx.textAlign = "right";
     ctx.fillText(receipt.timestamp, w - 25, y);
 
+    if (receipt.selectedSocials && receipt.selectedSocials.length > 0) {
+      y += 16;
+      ctx.textAlign = "left";
+      ctx.fillStyle = "#555555";
+      ctx.font = "10px 'Space Mono', 'Courier New', monospace";
+      ctx.fillText("PLATFORMS:", 25, y);
+      ctx.fillStyle = "#000000";
+      ctx.font = "10px 'Space Mono', 'Courier New', monospace";
+      ctx.textAlign = "right";
+      ctx.fillText(receipt.selectedSocials.join(", "), w - 25, y);
+    }
+
     y += 18;
     drawDashedLine(y);
 
@@ -98,6 +110,32 @@ export function downloadReceiptImage(receipt: ReceiptData): Promise<void> {
       ctx.fillStyle = "#333333";
       ctx.font = "10px 'Space Mono', 'Courier New', monospace";
       ctx.fillText(`> Risk: ${item.primaryRisk}`, 32, y);
+
+      if (item.id === "share-face" && receipt.expressionInputs?.facePhoto) {
+        y += 13;
+        ctx.fillStyle = "#000000";
+        ctx.fillText("> [Face Photo Captured]", 32, y);
+      }
+      if (item.id === "speak-mind" && receipt.expressionInputs?.mindText) {
+        y += 13;
+        ctx.fillStyle = "#000000";
+        ctx.fillText(`> "${receipt.expressionInputs.mindText.slice(0, 38)}"`, 32, y);
+      }
+      if (item.id === "share-location" && receipt.expressionInputs?.locationText) {
+        y += 13;
+        ctx.fillStyle = "#000000";
+        ctx.fillText(`> Loc: ${receipt.expressionInputs.locationText}`, 32, y);
+      }
+      if (item.id === "share-life" && receipt.expressionInputs?.lifeText) {
+        y += 13;
+        ctx.fillStyle = "#000000";
+        ctx.fillText(`> "${receipt.expressionInputs.lifeText.slice(0, 38)}"`, 32, y);
+      }
+      if (item.id === "share-identity" && receipt.expressionInputs?.identity?.name) {
+        y += 13;
+        ctx.fillStyle = "#000000";
+        ctx.fillText(`> Name: ${receipt.expressionInputs.identity.name}`, 32, y);
+      }
 
       y += 13;
       ctx.fillStyle = "#666666";
