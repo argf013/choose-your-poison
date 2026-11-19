@@ -224,8 +224,13 @@ export function generateEscPosReceipt(receipt: ReceiptData): Uint8Array {
     // Session info
     .align("left")
     .twoColumns("SESSION:", receipt.sessionId)
-    .twoColumns("TIMESTAMP:", receipt.timestamp)
+    .twoColumns("TIMESTAMP:", receipt.timestamp);
 
+  if (receipt.selectedSocials && receipt.selectedSocials.length > 0) {
+    builder.wrappedText(`PLATFORMS: ${receipt.selectedSocials.join(", ")}`, 0);
+  }
+
+  builder
     // Divider
     .divider()
 
@@ -243,8 +248,30 @@ export function generateEscPosReceipt(receipt: ReceiptData): Uint8Array {
         .bold(true)
         .line(`[${item.code}] ${item.title.toUpperCase()}`)
         .bold(false)
-        .wrappedText(`> Risk: ${item.primaryRisk}`, 2)
-        .wrappedText(`"${item.consequenceQuote}"`, 2);
+        .wrappedText(`> Risk: ${item.primaryRisk}`, 2);
+
+      if (item.id === "share-face" && receipt.expressionInputs?.facePhoto) {
+        builder.wrappedText("> [Face Photo Captured]", 2);
+      }
+      if (item.id === "speak-mind" && receipt.expressionInputs?.mindText) {
+        builder.wrappedText(`> "${receipt.expressionInputs.mindText}"`, 2);
+      }
+      if (item.id === "share-location" && receipt.expressionInputs?.locationText) {
+        builder.wrappedText(`> Loc: ${receipt.expressionInputs.locationText}`, 2);
+      }
+      if (item.id === "share-life" && receipt.expressionInputs?.lifeText) {
+        builder.wrappedText(`> "${receipt.expressionInputs.lifeText}"`, 2);
+      }
+      if (item.id === "share-identity" && receipt.expressionInputs?.identity) {
+        const id = receipt.expressionInputs.identity;
+        if (id.name) builder.wrappedText(`> Name: ${id.name}`, 2);
+        if (id.birthPlaceDate) builder.wrappedText(`> DOB: ${id.birthPlaceDate}`, 2);
+        if (id.address) builder.wrappedText(`> Addr: ${id.address}`, 2);
+        if (id.school) builder.wrappedText(`> School: ${id.school}`, 2);
+        if (id.graduation) builder.wrappedText(`> Grad: ${id.graduation}`, 2);
+      }
+
+      builder.wrappedText(`"${item.consequenceQuote}"`, 2);
     });
   }
 
