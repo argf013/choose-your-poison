@@ -257,20 +257,14 @@ export class EscPosBuilder {
       }
     }
 
-    // Send raster in small bands so cheap printers with small buffers
-    // don't drop rows (which shows up as broken / dashed lines).
-    const BAND_ROWS = 48;
+    // Single raster command: splitting into bands makes the print head
+    // pause between commands, leaving visible white lines.
     const xL = bytesPerRow & 0xff;
     const xH = (bytesPerRow >> 8) & 0xff;
-    for (let startRow = 0; startRow < targetHeight; startRow += BAND_ROWS) {
-      const rows = Math.min(BAND_ROWS, targetHeight - startRow);
-      const yL = rows & 0xff;
-      const yH = (rows >> 8) & 0xff;
-      this.buffer.push(GS, 0x76, 0x30, 0x00, xL, xH, yL, yH);
-      const from = startRow * bytesPerRow;
-      const to = (startRow + rows) * bytesPerRow;
-      for (let i = from; i < to; i++) this.buffer.push(bitmapBytes[i]);
-    }
+    const yL = targetHeight & 0xff;
+    const yH = (targetHeight >> 8) & 0xff;
+    this.buffer.push(GS, 0x76, 0x30, 0x00, xL, xH, yL, yH);
+    for (let i = 0; i < bitmapBytes.length; i++) this.buffer.push(bitmapBytes[i]);
     this.buffer.push(LF);
     return this;
   }
