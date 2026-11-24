@@ -102,10 +102,10 @@ export const SocialSelection: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-nordic-border/50">
         <div>
           <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-nordic-ink">
-            Which platforms do you use most?
+            Today&apos;s Special Menu
           </h2>
           <p className="text-sm sm:text-base text-nordic-muted mt-1.5 font-normal">
-            Select one, several, or all social media platforms you frequently use.
+            Choose your main course — select the social media platforms you use most.
           </p>
         </div>
 

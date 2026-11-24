@@ -67,10 +67,10 @@ export const Selection: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-nordic-border/50">
         <div>
           <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-nordic-ink">
-            Today&apos;s Special Menu
+            Choose Your Side Dish
           </h2>
           <p className="text-sm sm:text-base text-nordic-muted mt-1.5 font-normal">
-            Please select your desired experience
+            Pick what you&apos;d like to share alongside your main course.
           </p>
         </div>
 
