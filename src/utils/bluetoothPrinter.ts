@@ -163,16 +163,19 @@ export async function printViaBluetooth(bytes: Uint8Array): Promise<boolean> {
   }
 
   // Chunk bytes to fit within standard BLE MTU limits (100 bytes per chunk)
+  // Use acknowledged writes when available: write-without-response silently
+  // drops packets when the printer buffer is full, causing broken image rows.
   const chunkSize = 100;
+  const useAcked = !!cachedCharacteristic.properties.write;
   for (let offset = 0; offset < bytes.length; offset += chunkSize) {
     const chunk = bytes.slice(offset, offset + chunkSize);
-    if (cachedCharacteristic.properties.writeWithoutResponse) {
-      await cachedCharacteristic.writeValueWithoutResponse(chunk);
-    } else {
+    if (useAcked) {
       await cachedCharacteristic.writeValue(chunk);
+    } else {
+      await cachedCharacteristic.writeValueWithoutResponse(chunk);
     }
-    // Brief interval to allow thermal printer buffer to process
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    // Interval to allow thermal printer buffer to process
+    await new Promise((resolve) => setTimeout(resolve, useAcked ? 10 : 40));
   }
 
   return true;
