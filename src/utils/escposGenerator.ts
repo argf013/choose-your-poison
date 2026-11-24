@@ -283,7 +283,7 @@ export class EscPosBuilder {
  * Compose platform logos into one horizontal strip (PNG data URL) so they
  * print side by side on a single raster row.
  */
-async function buildLogoRowDataUrl(ids: string[], size = 56, gap = 16): Promise<string | null> {
+async function buildLogoRowDataUrl(ids: string[], size = 56, gap = 16): Promise<{ url: string; width: number } | null> {
   const urls = ids.map((id) => socialLogoDataUrl(id, size * 2)).filter((u): u is string => !!u);
   if (urls.length === 0) return null;
   const imgs = await Promise.all(
@@ -309,7 +309,7 @@ async function buildLogoRowDataUrl(ids: string[], size = 56, gap = 16): Promise<
   ctx.imageSmoothingQuality = "high";
   const startX = Math.floor((width - rawWidth) / 2);
   imgs.forEach((im, i) => ctx.drawImage(im, startX + i * (size + gap), 0, size, size));
-  return canvas.toDataURL("image/png");
+  return { url: canvas.toDataURL("image/png"), width };
 }
 
 /**
@@ -345,7 +345,8 @@ export async function generateEscPosReceipt(receipt: ReceiptData): Promise<Uint8
     try {
       const row = await buildLogoRowDataUrl(socials);
       if (row) {
-        await builder.rasterImage(row);
+        // Print 1:1 (no scaling) so logo size is the same for 1 or 5 platforms
+        await builder.rasterImage(row.url, row.width);
       } else {
         builder.line(socials.join(" | "));
       }
