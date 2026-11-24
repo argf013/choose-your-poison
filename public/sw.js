@@ -1,4 +1,4 @@
-const CACHE_NAME = "your-poison-v1";
+const CACHE_NAME = "your-poison-v2";
 const ASSETS_TO_CACHE = [
   "/",
   "/index.html",
