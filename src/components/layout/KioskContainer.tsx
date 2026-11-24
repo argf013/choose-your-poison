@@ -19,6 +19,7 @@ export const KioskContainer: React.FC = () => {
     currentStep,
     setStep,
     selectedSocials,
+    socialHandles,
     selectedExpressionIds,
     expressionInputs,
     sessionId,
@@ -41,9 +42,10 @@ export const KioskContainer: React.FC = () => {
         selectedExpressions,
         paperWidth,
         selectedSocials,
-        expressionInputs
+        expressionInputs,
+        socialHandles
       ),
-    [sessionId, selectedExpressions, paperWidth, selectedSocials, expressionInputs]
+    [sessionId, selectedExpressions, paperWidth, selectedSocials, expressionInputs, socialHandles]
   );
 
   // Keyboard navigation & kiosk shortcuts
