@@ -1,4 +1,5 @@
 import { ReceiptData } from "../types";
+import { SOCIAL_COPY, SIDE_DISH_COPY, socialLogoDataUrl } from "../data/receiptCopy";
 
 /**
  * ESC/POS Command Byte Constants
@@ -195,8 +196,8 @@ export class EscPosBuilder {
   /**
    * Convert a base64 image data URL into ESC/POS GS v 0 monochrome raster bitmap
    */
-  async rasterImage(dataUrl: string): Promise<this> {
-    const maxDots = this.charsPerLine === 48 ? 576 : 384;
+  async rasterImage(dataUrl: string, widthDots?: number): Promise<this> {
+    const maxDots = Math.min(widthDots ?? 9999, this.charsPerLine === 48 ? 576 : 384);
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
       const image = new Image();
       image.onload = () => resolve(image);
@@ -282,121 +283,89 @@ export class EscPosBuilder {
  */
 export async function generateEscPosReceipt(receipt: ReceiptData): Promise<Uint8Array> {
   const builder = new EscPosBuilder(receipt.paperWidth);
+  const inputs = receipt.expressionInputs || {};
 
   builder
     .init()
-    // Header
     .align("center")
     .bold(true)
     .textDoubleSize(true)
-    .line("CHOOSE YOUR POISON")
+    .line("YOUR POISON")
     .textDoubleSize(false)
     .line("FREEDOM OF EXPRESSION TERMINAL")
     .bold(false)
     .feed(1)
-
-    // Divider
     .doubleDivider()
-
-    // Session info
     .align("left")
     .twoColumns("SESSION:", receipt.sessionId)
-    .twoColumns("TIMESTAMP:", receipt.timestamp);
+    .twoColumns("DATE:", receipt.timestamp)
+    .divider();
 
-  if (receipt.selectedSocials && receipt.selectedSocials.length > 0) {
-    builder.wrappedText(`PLATFORMS: ${receipt.selectedSocials.join(", ")}`, 0);
+  // Main course: chosen platforms
+  builder.align("center").bold(true).line("MAIN COURSE").bold(false).feed(1);
+  const socials = receipt.selectedSocials || [];
+  if (socials.length === 0) {
+    builder.line("-");
   }
-
-  builder
-    // Divider
-    .divider()
-
-    // Recorded Expressions
-    .bold(true)
-    .line("RECORDED EXPRESSIONS & RISKS:")
-    .bold(false);
-
-  if (receipt.selectedExpressions.length === 0) {
-    builder.align("center").line("[ No expressions selected ]").align("left");
-  } else {
-    for (const item of receipt.selectedExpressions) {
-      builder
-        .feed(1)
-        .bold(true)
-        .line(`[${item.code}] ${item.title.toUpperCase()}`)
-        .bold(false)
-        .wrappedText(`> Risk: ${item.primaryRisk}`, 2);
-
-      if (item.id === "share-face" && receipt.expressionInputs?.facePhoto) {
-        try {
-          builder.align("center");
-          await builder.rasterImage(receipt.expressionInputs.facePhoto);
-          builder.align("left");
-        } catch {
-          builder.wrappedText("> [Face Photo Captured]", 2);
-        }
+  for (const id of socials) {
+    const copy = SOCIAL_COPY[id];
+    const logo = socialLogoDataUrl(id, 96);
+    if (logo) {
+      try {
+        await builder.rasterImage(logo, 96);
+      } catch {
+        // skip logo, name below still prints
       }
-      if (item.id === "speak-mind" && receipt.expressionInputs?.mindText) {
-        builder.wrappedText(`> "${receipt.expressionInputs.mindText}"`, 2);
-      }
-      if (item.id === "share-location" && receipt.expressionInputs?.locationText) {
-        builder.wrappedText(`> Loc: ${receipt.expressionInputs.locationText}`, 2);
-      }
-      if (item.id === "share-life" && receipt.expressionInputs?.lifeText) {
-        builder.wrappedText(`> "${receipt.expressionInputs.lifeText}"`, 2);
-      }
-      if (item.id === "share-identity" && receipt.expressionInputs?.identity) {
-        const id = receipt.expressionInputs.identity;
-        if (id.name) builder.wrappedText(`> Name: ${id.name}`, 2);
-        if (id.birthPlaceDate) builder.wrappedText(`> DOB: ${id.birthPlaceDate}`, 2);
-        if (id.address) builder.wrappedText(`> Addr: ${id.address}`, 2);
-        if (id.school) builder.wrappedText(`> School: ${id.school}`, 2);
-        if (id.graduation) builder.wrappedText(`> Grad: ${id.graduation}`, 2);
-      }
-
-      builder.wrappedText(`"${item.consequenceQuote}"`, 2);
     }
+    builder.bold(true).line((copy?.name || id).toUpperCase()).bold(false);
+    if (copy) builder.wrappedText(copy.description, 0);
+    builder.feed(1);
+  }
+  builder.divider();
+
+  // Side dishes: what was shared
+  builder.align("center").bold(true).line("SIDE DISHES").bold(false).feed(1).align("left");
+  const dishes = receipt.selectedExpressions;
+  if (dishes.length === 0) {
+    builder.align("center").line("-").align("left");
+  }
+  for (const item of dishes) {
+    const copy = SIDE_DISH_COPY[item.id] || { title: item.title, why: item.consequenceQuote };
+    builder.bold(true).line(copy.title).bold(false);
+
+    if (item.id === "share-face" && inputs.facePhoto) {
+      try {
+        builder.align("center");
+        await builder.rasterImage(inputs.facePhoto);
+        builder.align("left");
+      } catch {
+        builder.align("left").line("[Photo captured]");
+      }
+    }
+    if (item.id === "speak-mind" && inputs.mindText) builder.wrappedText(`"${inputs.mindText}"`);
+    if (item.id === "share-location" && inputs.locationText) builder.wrappedText(inputs.locationText);
+    if (item.id === "share-life" && inputs.lifeText) builder.wrappedText(`"${inputs.lifeText}"`);
+    if (item.id === "share-identity" && inputs.identity) {
+      const id = inputs.identity;
+      if (id.name) builder.wrappedText(`Name: ${id.name}`);
+      if (id.birthPlaceDate) builder.wrappedText(`DOB: ${id.birthPlaceDate}`);
+      if (id.address) builder.wrappedText(`Address: ${id.address}`);
+      if (id.school) builder.wrappedText(`School: ${id.school}`);
+      if (id.graduation) builder.wrappedText(`Graduation: ${id.graduation}`);
+    }
+    builder.wrappedText(copy.why).feed(1);
   }
 
-  // Divider
   builder
-    .feed(1)
-    .divider()
-
-    // The Hidden Cost
-    .bold(true)
-    .line("THE HIDDEN COST:")
-    .bold(false)
-    .line("* Your biometric geometry")
-    .line("* Your permanent digital footprint")
-    .line("* Your private contextual boundaries")
-    .line("* Your perpetual surveillance record")
-
-    // Divider
     .doubleDivider()
-
-    // Philosophy closing
     .align("center")
     .bold(true)
-    .line("YOU CHOSE YOUR POISON.")
+    .line("THANK YOU FOR YOUR ORDER")
+    .line("ENJOY YOUR POISON")
     .bold(false)
-    .line("You knew the risks.")
-    .line("You made the choice.")
     .feed(1)
-
-    // Barcode
     .barcode(receipt.checksum)
     .line(`* ${receipt.checksum} *`)
-    .feed(1)
-
-    // Footer divider & message
-    .divider()
-    .bold(true)
-    .line("THANK YOU FOR YOUR EXPRESSION.")
-    .bold(false)
-    .line("KEEP THIS PHYSICAL RECORD AS PROOF")
-
-    // Cut paper
     .cut(4);
 
   return builder.build();

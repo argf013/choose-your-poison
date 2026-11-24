@@ -1,5 +1,6 @@
 import React from "react";
 import { ReceiptData } from "../../types";
+import { SOCIAL_COPY, SIDE_DISH_COPY, socialLogoDataUrl } from "../../data/receiptCopy";
 
 interface ThermalReceiptProps {
   receipt: ReceiptData;
@@ -50,142 +51,107 @@ export const ThermalReceipt: React.FC<ThermalReceiptProps> = ({
     >
       {/* Receipt Header */}
       <div className="text-center pb-2">
-        <h1 className="text-base sm:text-lg font-bold tracking-wider mt-1 mb-0.5 text-black">
-          CHOOSE YOUR POISON
+        <h1 className="text-lg sm:text-xl font-bold tracking-wider mt-1 mb-0.5 text-black">
+          YOUR POISON
         </h1>
         <p className="text-[9px] tracking-widest text-neutral-600 uppercase">
           FREEDOM OF EXPRESSION TERMINAL
         </p>
       </div>
 
-      {/* Double line divider */}
       <div className="border-t-2 border-dashed border-black/30 my-3" />
 
-      {/* Session Metadata Table */}
       <div className="text-[11px] space-y-1 py-0.5 font-mono">
         <div className="flex justify-between items-center">
           <span className="text-neutral-500">SESSION:</span>
           <span className="font-bold tracking-wider">{receipt.sessionId}</span>
         </div>
         <div className="flex justify-between items-center text-[10px]">
-          <span className="text-neutral-500">TIMESTAMP:</span>
+          <span className="text-neutral-500">DATE:</span>
           <span className="font-medium">{receipt.timestamp}</span>
         </div>
-        {receipt.selectedSocials && receipt.selectedSocials.length > 0 && (
-          <div className="flex justify-between items-start text-[10px] gap-2">
-            <span className="text-neutral-500 shrink-0">PLATFORMS:</span>
-            <span className="font-medium text-right">{receipt.selectedSocials.join(", ")}</span>
-          </div>
-        )}
       </div>
 
-      {/* Divider */}
       <div className="border-t border-dashed border-black/25 my-3" />
 
-      {/* Selected Expressions List */}
-      <div className="py-0.5">
-        <div className="text-[10px] tracking-wider font-bold uppercase text-neutral-600 mb-2.5">
-          RECORDED EXPRESSIONS &amp; RISKS:
+      {/* Main Course */}
+      <div className="text-center">
+        <div className="text-xs font-bold tracking-widest uppercase mb-2">Main Course</div>
+        {(receipt.selectedSocials || []).length === 0 && (
+          <div className="text-xs text-neutral-500">-</div>
+        )}
+        <div className="space-y-3">
+          {(receipt.selectedSocials || []).map((id) => {
+            const copy = SOCIAL_COPY[id];
+            const logo = socialLogoDataUrl(id, 96);
+            return (
+              <div key={id} className="flex flex-col items-center">
+                {logo && <img src={logo} alt={id} className="w-9 h-9 mb-1" />}
+                <div className="text-[11px] font-bold uppercase">{copy?.name || id}</div>
+                {copy && (
+                  <div className="text-[10px] text-neutral-700 leading-snug mt-0.5">
+                    {copy.description}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
+      </div>
 
+      <div className="border-t border-dashed border-black/25 my-3" />
+
+      {/* Side Dishes */}
+      <div>
+        <div className="text-center text-xs font-bold tracking-widest uppercase mb-2">
+          Side Dishes
+        </div>
         {receipt.selectedExpressions.length === 0 ? (
-          <div className="text-xs italic text-neutral-500 py-2 text-center">
-            [ No expressions selected ]
-          </div>
+          <div className="text-xs text-neutral-500 text-center">-</div>
         ) : (
           <div className="space-y-3">
-            {receipt.selectedExpressions.map((item) => (
-              <div key={item.id} className="receipt-section-item text-[11px]">
-                <div className="font-bold flex justify-between text-black">
-                  <span>
-                    [{item.code}] {item.title}
-                  </span>
-                </div>
-                <div className="text-[10px] text-neutral-700 pl-3 mt-0.5">
-                  &gt; Risk: <span className="font-semibold">{item.primaryRisk}</span>
-                </div>
-
-                {/* Captured User Input */}
-                {item.id === "share-face" && receipt.expressionInputs?.facePhoto && (
-                  <div className="mt-2">
+            {receipt.selectedExpressions.map((item) => {
+              const copy = SIDE_DISH_COPY[item.id] || {
+                title: item.title,
+                why: item.consequenceQuote,
+              };
+              const inputs = receipt.expressionInputs || {};
+              const id = inputs.identity;
+              return (
+                <div key={item.id} className="text-[10px] leading-snug">
+                  <div className="text-[11px] font-bold">{copy.title}</div>
+                  {item.id === "share-face" && inputs.facePhoto && (
                     <img
-                      src={receipt.expressionInputs.facePhoto}
+                      src={inputs.facePhoto}
                       alt="Captured face"
-                      className="w-full h-auto object-cover grayscale contrast-125 border border-black/30"
+                      className="w-full h-auto object-cover grayscale contrast-125 border border-black/30 my-1"
                     />
-                  </div>
-                )}
-                {item.id === "speak-mind" && receipt.expressionInputs?.mindText && (
-                  <div className="text-[10px] text-black pl-3 mt-1 border-l-2 border-black/30 ml-3">
-                    &ldquo;{receipt.expressionInputs.mindText}&rdquo;
-                  </div>
-                )}
-                {item.id === "share-location" && receipt.expressionInputs?.locationText && (
-                  <div className="text-[10px] text-black pl-3 mt-0.5 font-mono">
-                    &gt; Loc: {receipt.expressionInputs.locationText}
-                  </div>
-                )}
-                {item.id === "share-life" && receipt.expressionInputs?.lifeText && (
-                  <div className="text-[10px] text-black pl-3 mt-1 border-l-2 border-black/30 ml-3">
-                    &ldquo;{receipt.expressionInputs.lifeText}&rdquo;
-                  </div>
-                )}
-                {item.id === "share-identity" && receipt.expressionInputs?.identity && (
-                  <div className="text-[9px] text-black pl-3 mt-1 space-y-0.5">
-                    {receipt.expressionInputs.identity.name && (
-                      <div>&gt; Name: {receipt.expressionInputs.identity.name}</div>
-                    )}
-                    {receipt.expressionInputs.identity.birthPlaceDate && (
-                      <div>&gt; DOB: {receipt.expressionInputs.identity.birthPlaceDate}</div>
-                    )}
-                    {receipt.expressionInputs.identity.address && (
-                      <div>&gt; Addr: {receipt.expressionInputs.identity.address}</div>
-                    )}
-                    {receipt.expressionInputs.identity.school && (
-                      <div>&gt; School: {receipt.expressionInputs.identity.school}</div>
-                    )}
-                    {receipt.expressionInputs.identity.graduation && (
-                      <div>&gt; Grad: {receipt.expressionInputs.identity.graduation}</div>
-                    )}
-                  </div>
-                )}
-
-                <div className="text-[9px] text-neutral-500 italic pl-3 mt-0.5 leading-snug">
-                  &ldquo;{item.consequenceQuote}&rdquo;
+                  )}
+                  {item.id === "speak-mind" && inputs.mindText && <div>&ldquo;{inputs.mindText}&rdquo;</div>}
+                  {item.id === "share-location" && inputs.locationText && <div>{inputs.locationText}</div>}
+                  {item.id === "share-life" && inputs.lifeText && <div>&ldquo;{inputs.lifeText}&rdquo;</div>}
+                  {item.id === "share-identity" && id && (
+                    <div>
+                      {id.name && <div>Name: {id.name}</div>}
+                      {id.birthPlaceDate && <div>DOB: {id.birthPlaceDate}</div>}
+                      {id.address && <div>Address: {id.address}</div>}
+                      {id.school && <div>School: {id.school}</div>}
+                      {id.graduation && <div>Graduation: {id.graduation}</div>}
+                    </div>
+                  )}
+                  <div className="text-neutral-600 mt-0.5">{copy.why}</div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
 
-      {/* Divider */}
-      <div className="border-t border-dashed border-black/25 my-3" />
-
-      {/* The Hidden Cost Section */}
-      <div className="text-[10px] py-0.5 text-neutral-700 space-y-1">
-        <div className="font-bold text-black uppercase text-[10px] tracking-wider">
-          THE HIDDEN COST:
-        </div>
-        <div className="pl-1 space-y-0.5 text-[10px]">
-          <div>• Your biometric and facial geometry</div>
-          <div>• Your permanent digital footprint</div>
-          <div>• Your private contextual boundaries</div>
-          <div>• Your perpetual surveillance record</div>
-        </div>
-      </div>
-
-      {/* Divider */}
       <div className="border-t-2 border-dashed border-black/30 my-3" />
 
-      {/* Philosophy Closing Paradox */}
-      <div className="text-center py-1.5 space-y-1">
-        <div className="font-bold text-xs tracking-wider text-black">YOU CHOSE YOUR POISON.</div>
-        <p className="text-[10px] text-neutral-600 leading-tight">
-          You knew the risks.
-          <br />
-          You made the choice.
-        </p>
+      <div className="text-center py-1 space-y-0.5">
+        <div className="font-bold text-xs tracking-wider text-black">THANK YOU FOR YOUR ORDER</div>
+        <div className="font-bold text-xs tracking-wider text-black">ENJOY YOUR POISON</div>
       </div>
 
       {/* Barcode Section */}
@@ -202,15 +168,6 @@ export const ThermalReceipt: React.FC<ThermalReceiptProps> = ({
         <div className="text-[9px] tracking-[0.25em] text-neutral-600 mt-1.5 font-mono">
           *{receipt.checksum}*
         </div>
-      </div>
-
-      {/* Final Divider */}
-      <div className="border-t border-dashed border-black/25 my-3" />
-
-      {/* Footer Acknowledgement */}
-      <div className="text-center pt-0.5 text-[9px] text-neutral-600 space-y-0.5">
-        <div className="font-bold text-black tracking-wider">THANK YOU FOR YOUR EXPRESSION.</div>
-        <div className="text-[8px] text-neutral-400">KEEP THIS PHYSICAL RECORD AS PROOF</div>
       </div>
     </div>
   );
