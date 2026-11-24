@@ -374,7 +374,7 @@ export async function generateEscPosReceipt(receipt: ReceiptData): Promise<Uint8
     const copy = SIDE_DISH_COPY[item.id] || { title: item.title, why: item.consequenceQuote };
     builder
       .bold(true)
-      .line(copy.title)
+      .line(item.title.toUpperCase())
       .bold(false)
       .wrappedText(`> Risk: ${item.primaryRisk}`, 0);
 
@@ -384,12 +384,12 @@ export async function generateEscPosReceipt(receipt: ReceiptData): Promise<Uint8
         await builder.rasterImage(inputs.facePhoto);
         builder.align("left");
       } catch {
-        builder.align("left").line("[Photo captured]");
+        builder.align("left").line("> [Photo captured]");
       }
     }
-    if (item.id === "speak-mind" && inputs.mindText) builder.wrappedText(`"${inputs.mindText}"`);
+    if (item.id === "speak-mind" && inputs.mindText) builder.wrappedText(`> "${inputs.mindText}"`);
     if (item.id === "share-location" && inputs.locationText) {
-      builder.wrappedText(inputs.locationText);
+      builder.wrappedText(`> ${inputs.locationText}`);
       const map = await getStaticMapDataUrl(inputs.locationText);
       if (map) {
         try {
@@ -401,14 +401,14 @@ export async function generateEscPosReceipt(receipt: ReceiptData): Promise<Uint8
         }
       }
     }
-    if (item.id === "share-life" && inputs.lifeText) builder.wrappedText(`"${inputs.lifeText}"`);
+    if (item.id === "share-life" && inputs.lifeText) builder.wrappedText(`> "${inputs.lifeText}"`);
     if (item.id === "share-identity" && inputs.identity) {
       const id = inputs.identity;
-      if (id.name) builder.wrappedText(`Name: ${id.name}`);
-      if (id.birthPlaceDate) builder.wrappedText(`DOB: ${id.birthPlaceDate}`);
-      if (id.address) builder.wrappedText(`Address: ${id.address}`);
-      if (id.school) builder.wrappedText(`School: ${id.school}`);
-      if (id.graduation) builder.wrappedText(`Graduation: ${id.graduation}`);
+      if (id.name) builder.wrappedText(`> Name: ${id.name}`);
+      if (id.birthPlaceDate) builder.wrappedText(`> DOB: ${id.birthPlaceDate}`);
+      if (id.address) builder.wrappedText(`> Address: ${id.address}`);
+      if (id.school) builder.wrappedText(`> School: ${id.school}`);
+      if (id.graduation) builder.wrappedText(`> Graduation: ${id.graduation}`);
     }
     builder.wrappedText(copy.why).feed(1);
   }

@@ -139,7 +139,7 @@ export const ThermalReceipt: React.FC<ThermalReceiptProps> = ({
               const id = inputs.identity;
               return (
                 <div key={item.id} className="text-[10px] leading-snug">
-                  <div className="text-[11px] font-bold">{copy.title}</div>
+                  <div className="text-[11px] font-bold uppercase">{item.title}</div>
                   <div className="text-[10px] font-medium text-neutral-700">
                     &gt; Risk: {item.primaryRisk}
                   </div>
@@ -150,10 +150,10 @@ export const ThermalReceipt: React.FC<ThermalReceiptProps> = ({
                       className="w-full h-auto object-cover grayscale contrast-125 border border-black/30 my-1"
                     />
                   )}
-                  {item.id === "speak-mind" && inputs.mindText && <div>&ldquo;{inputs.mindText}&rdquo;</div>}
+                  {item.id === "speak-mind" && inputs.mindText && <div>&gt; &ldquo;{inputs.mindText}&rdquo;</div>}
                   {item.id === "share-location" && inputs.locationText && (
                     <div>
-                      <div>{inputs.locationText}</div>
+                      <div>&gt; {inputs.locationText}</div>
                       {mapUrl && (
                         <img
                           src={mapUrl}
@@ -163,14 +163,14 @@ export const ThermalReceipt: React.FC<ThermalReceiptProps> = ({
                       )}
                     </div>
                   )}
-                  {item.id === "share-life" && inputs.lifeText && <div>&ldquo;{inputs.lifeText}&rdquo;</div>}
+                  {item.id === "share-life" && inputs.lifeText && <div>&gt; &ldquo;{inputs.lifeText}&rdquo;</div>}
                   {item.id === "share-identity" && id && (
                     <div>
-                      {id.name && <div>Name: {id.name}</div>}
-                      {id.birthPlaceDate && <div>DOB: {id.birthPlaceDate}</div>}
-                      {id.address && <div>Address: {id.address}</div>}
-                      {id.school && <div>School: {id.school}</div>}
-                      {id.graduation && <div>Graduation: {id.graduation}</div>}
+                      {id.name && <div>&gt; Name: {id.name}</div>}
+                      {id.birthPlaceDate && <div>&gt; DOB: {id.birthPlaceDate}</div>}
+                      {id.address && <div>&gt; Address: {id.address}</div>}
+                      {id.school && <div>&gt; School: {id.school}</div>}
+                      {id.graduation && <div>&gt; Graduation: {id.graduation}</div>}
                     </div>
                   )}
                   <div className="text-neutral-600 mt-0.5">{copy.why}</div>
