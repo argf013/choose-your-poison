@@ -372,7 +372,11 @@ export async function generateEscPosReceipt(receipt: ReceiptData): Promise<Uint8
   }
   for (const item of dishes) {
     const copy = SIDE_DISH_COPY[item.id] || { title: item.title, why: item.consequenceQuote };
-    builder.bold(true).line(copy.title).bold(false);
+    builder
+      .bold(true)
+      .line(copy.title)
+      .bold(false)
+      .wrappedText(`> Risk: ${item.primaryRisk}`, 0);
 
     if (item.id === "share-face" && inputs.facePhoto) {
       try {

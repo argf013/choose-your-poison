@@ -140,6 +140,9 @@ export const ThermalReceipt: React.FC<ThermalReceiptProps> = ({
               return (
                 <div key={item.id} className="text-[10px] leading-snug">
                   <div className="text-[11px] font-bold">{copy.title}</div>
+                  <div className="text-[10px] font-medium text-neutral-700">
+                    &gt; Risk: {item.primaryRisk}
+                  </div>
                   {item.id === "share-face" && inputs.facePhoto && (
                     <img
                       src={inputs.facePhoto}
