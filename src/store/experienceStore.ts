@@ -3,6 +3,7 @@ import { ExpressionInputs, ScreenStep } from "../types";
 
 interface ExperienceState {
   currentStep: ScreenStep;
+  skipAutoPrint: boolean;
   selectedSocials: string[];
   socialHandles: Record<string, string>;
   selectedExpressionIds: string[];
@@ -16,6 +17,7 @@ interface ExperienceState {
 
   // Actions
   setStep: (step: ScreenStep) => void;
+  jumpToStep: (step: ScreenStep) => void;
   toggleSocial: (id: string) => void;
   setSocialHandle: (id: string, value: string) => void;
   selectAllSocials: (ids: string[]) => void;
@@ -40,6 +42,7 @@ const generateSessionId = (): string => {
 
 export const useExperienceStore = create<ExperienceState>((set) => ({
   currentStep: "introduction",
+  skipAutoPrint: false,
   selectedSocials: [],
   socialHandles: {},
   selectedExpressionIds: [],
@@ -51,7 +54,10 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
   isPrinting: false,
   hasPrinted: false,
 
-  setStep: (step) => set({ currentStep: step }),
+  setStep: (step) => set({ currentStep: step, skipAutoPrint: false }),
+
+  // Used by the header nav: jump around without triggering auto print
+  jumpToStep: (step) => set({ currentStep: step, skipAutoPrint: true }),
 
   toggleSocial: (id) =>
     set((state) => {
@@ -114,6 +120,7 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
   resetSession: () =>
     set({
       currentStep: "introduction",
+      skipAutoPrint: false,
       selectedSocials: [],
       socialHandles: {},
       selectedExpressionIds: [],

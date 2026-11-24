@@ -34,6 +34,7 @@ export const ReceiptPreview: React.FC = () => {
     setPaperWidth,
     setStep,
     resetSession,
+    skipAutoPrint,
     isPrinting,
     setIsPrinting,
     hasPrinted,
@@ -124,6 +125,9 @@ export const ReceiptPreview: React.FC = () => {
   const hasAutoPrintedRef = useRef(false);
 
   useEffect(() => {
+    // Opened from the header nav: just show the receipt, no print / no auto reset
+    if (skipAutoPrint) return;
+
     if (!hasAutoPrintedRef.current) {
       hasAutoPrintedRef.current = true;
       handlePrint();

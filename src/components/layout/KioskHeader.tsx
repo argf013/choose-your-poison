@@ -7,15 +7,14 @@ import { PrinterModal } from "../printer/PrinterModal";
 import { usePwaInstall } from "../../utils/usePwaInstall";
 
 const STEPS: { id: ScreenStep; label: string }[] = [
-  { id: "welcome", label: "Start" },
-  { id: "introduction", label: "Narrative" },
-  { id: "selection", label: "Expression" },
-  { id: "reflection", label: "Reflection" },
-  { id: "receipt", label: "Receipt" },
+  { id: "introduction", label: "Start" },
+  { id: "social", label: "Main Course" },
+  { id: "selection", label: "Side Dish" },
+  { id: "receipt", label: "Dessert" },
 ];
 
 export const KioskHeader: React.FC = () => {
-  const { currentStep, setStep, sessionId, audioEnabled, toggleAudio, resetSession } =
+  const { currentStep, jumpToStep, sessionId, audioEnabled, toggleAudio, resetSession } =
     useExperienceStore();
   const [isPrinterModalOpen, setIsPrinterModalOpen] = useState(false);
   const { isInstallable, installPwa } = usePwaInstall();
@@ -43,7 +42,7 @@ export const KioskHeader: React.FC = () => {
                 key={step.id}
                 onClick={() => {
                   if (audioEnabled) sounds.playClick();
-                  setStep(step.id);
+                  jumpToStep(step.id);
                 }}
                 className={`flex items-center px-3 py-1 rounded-full transition-all text-xs cursor-pointer ${
                   isActive
