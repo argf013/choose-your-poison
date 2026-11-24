@@ -10,7 +10,8 @@ const STEPS: { id: ScreenStep; label: string }[] = [
   { id: "introduction", label: "Start" },
   { id: "social", label: "Main Course" },
   { id: "selection", label: "Side Dish" },
-  { id: "receipt", label: "Dessert" },
+  { id: "reflection", label: "Dessert" },
+  { id: "receipt", label: "Receipt" },
 ];
 
 export const KioskHeader: React.FC = () => {
