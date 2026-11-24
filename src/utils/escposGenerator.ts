@@ -1,4 +1,5 @@
 import { ReceiptData } from "../types";
+import { getStaticMapDataUrl } from "./staticMap";
 import { SIDE_DISH_COPY, socialLogoDataUrl } from "../data/receiptCopy";
 
 /**
@@ -374,7 +375,19 @@ export async function generateEscPosReceipt(receipt: ReceiptData): Promise<Uint8
       }
     }
     if (item.id === "speak-mind" && inputs.mindText) builder.wrappedText(`"${inputs.mindText}"`);
-    if (item.id === "share-location" && inputs.locationText) builder.wrappedText(inputs.locationText);
+    if (item.id === "share-location" && inputs.locationText) {
+      builder.wrappedText(inputs.locationText);
+      const map = await getStaticMapDataUrl(inputs.locationText);
+      if (map) {
+        try {
+          builder.align("center");
+          await builder.rasterImage(map);
+          builder.align("left");
+        } catch {
+          builder.align("left");
+        }
+      }
+    }
     if (item.id === "share-life" && inputs.lifeText) builder.wrappedText(`"${inputs.lifeText}"`);
     if (item.id === "share-identity" && inputs.identity) {
       const id = inputs.identity;

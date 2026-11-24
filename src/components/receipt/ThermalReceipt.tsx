@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ReceiptData } from "../../types";
+import { getStaticMapDataUrl } from "../../utils/staticMap";
 import { SIDE_DISH_COPY, socialLogoDataUrl } from "../../data/receiptCopy";
 
 interface ThermalReceiptProps {
@@ -11,6 +12,19 @@ export const ThermalReceipt: React.FC<ThermalReceiptProps> = ({
   receipt,
   isPrintVersion = false,
 }) => {
+  const [mapUrl, setMapUrl] = useState<string | null>(null);
+  const locationText = receipt.expressionInputs?.locationText;
+  useEffect(() => {
+    let alive = true;
+    setMapUrl(null);
+    getStaticMapDataUrl(locationText).then((u) => {
+      if (alive) setMapUrl(u);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [locationText]);
+
   // Realistic authentic barcode bars based on checksum
   const barcodeBars = React.useMemo(() => {
     const bars: { width: number; isBlack: boolean }[] = [];
@@ -123,7 +137,18 @@ export const ThermalReceipt: React.FC<ThermalReceiptProps> = ({
                     />
                   )}
                   {item.id === "speak-mind" && inputs.mindText && <div>&ldquo;{inputs.mindText}&rdquo;</div>}
-                  {item.id === "share-location" && inputs.locationText && <div>{inputs.locationText}</div>}
+                  {item.id === "share-location" && inputs.locationText && (
+                    <div>
+                      <div>{inputs.locationText}</div>
+                      {mapUrl && (
+                        <img
+                          src={mapUrl}
+                          alt="Location map"
+                          className="w-full h-auto grayscale contrast-125 my-1"
+                        />
+                      )}
+                    </div>
+                  )}
                   {item.id === "share-life" && inputs.lifeText && <div>&ldquo;{inputs.lifeText}&rdquo;</div>}
                   {item.id === "share-identity" && id && (
                     <div>
