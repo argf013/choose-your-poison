@@ -40,6 +40,7 @@ export interface ReceiptData {
   timestamp: string; // Formatted date e.g. 09 NOV 2026, 14:22:05
   isoDate: string;
   selectedSocials: string[];
+  socialHandles?: Record<string, string>;
   selectedExpressions: ExpressionItem[];
   expressionInputs: ExpressionInputs;
   hiddenCosts: string[];

@@ -106,6 +106,17 @@ export const ThermalReceipt: React.FC<ThermalReceiptProps> = ({
             );
           })}
         </div>
+        {(receipt.selectedSocials || []).some((id) => receipt.socialHandles?.[id]?.trim()) && (
+          <div className="mt-2 text-left text-[10px] leading-snug space-y-0.5">
+            {(receipt.selectedSocials || [])
+              .filter((id) => receipt.socialHandles?.[id]?.trim())
+              .map((id) => (
+                <div key={id} className="break-words">
+                  {id}: {receipt.socialHandles?.[id]?.trim()}
+                </div>
+              ))}
+          </div>
+        )}
       </div>
 
       <div className="border-t border-dashed border-black/25 my-3" />

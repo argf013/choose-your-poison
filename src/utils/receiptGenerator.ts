@@ -40,7 +40,8 @@ export function generateReceiptData(
   selectedExpressions: ExpressionItem[],
   paperWidth: "58mm" | "80mm" = "58mm",
   selectedSocials: string[] = [],
-  expressionInputs: ExpressionInputs = {}
+  expressionInputs: ExpressionInputs = {},
+  socialHandles: Record<string, string> = {}
 ): ReceiptData {
   const { formatted, iso } = formatInstallationDate();
 
@@ -66,6 +67,7 @@ export function generateReceiptData(
     timestamp: formatted,
     isoDate: iso,
     selectedSocials,
+    socialHandles,
     selectedExpressions,
     expressionInputs,
     hiddenCosts,

@@ -353,6 +353,14 @@ export async function generateEscPosReceipt(receipt: ReceiptData): Promise<Uint8
       builder.line(socials.join(" | "));
     }
   }
+  const handles = receipt.socialHandles || {};
+  const handleLines = socials.filter((id) => (handles[id] || "").trim());
+  if (handleLines.length > 0) {
+    builder.feed(1).align("left");
+    for (const id of handleLines) {
+      builder.wrappedText(`${id}: ${handles[id].trim()}`);
+    }
+  }
   builder.divider();
 
   // Side dishes: what was shared

@@ -4,6 +4,7 @@ import { ExpressionInputs, ScreenStep } from "../types";
 interface ExperienceState {
   currentStep: ScreenStep;
   selectedSocials: string[];
+  socialHandles: Record<string, string>;
   selectedExpressionIds: string[];
   expressionInputs: ExpressionInputs;
   sessionId: string;
@@ -16,6 +17,7 @@ interface ExperienceState {
   // Actions
   setStep: (step: ScreenStep) => void;
   toggleSocial: (id: string) => void;
+  setSocialHandle: (id: string, value: string) => void;
   selectAllSocials: (ids: string[]) => void;
   clearSocials: () => void;
   toggleExpression: (id: string) => void;
@@ -39,6 +41,7 @@ const generateSessionId = (): string => {
 export const useExperienceStore = create<ExperienceState>((set) => ({
   currentStep: "introduction",
   selectedSocials: [],
+  socialHandles: {},
   selectedExpressionIds: [],
   expressionInputs: {},
   sessionId: generateSessionId(),
@@ -59,6 +62,9 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
           : [...state.selectedSocials, id],
       };
     }),
+
+  setSocialHandle: (id, value) =>
+    set((state) => ({ socialHandles: { ...state.socialHandles, [id]: value } })),
 
   selectAllSocials: (ids) => set({ selectedSocials: ids }),
 
@@ -109,6 +115,7 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
     set({
       currentStep: "introduction",
       selectedSocials: [],
+      socialHandles: {},
       selectedExpressionIds: [],
       expressionInputs: {},
       sessionId: generateSessionId(),

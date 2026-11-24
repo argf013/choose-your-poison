@@ -27,6 +27,7 @@ export const ReceiptPreview: React.FC = () => {
   const {
     sessionId,
     selectedSocials,
+    socialHandles,
     selectedExpressionIds,
     expressionInputs,
     paperWidth,
@@ -66,9 +67,10 @@ export const ReceiptPreview: React.FC = () => {
         selectedExpressions,
         paperWidth,
         selectedSocials,
-        expressionInputs
+        expressionInputs,
+        socialHandles
       ),
-    [sessionId, selectedExpressions, paperWidth, selectedSocials, expressionInputs]
+    [sessionId, selectedExpressions, paperWidth, selectedSocials, expressionInputs, socialHandles]
   );
 
   const handlePrint = async () => {

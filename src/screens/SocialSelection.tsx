@@ -11,6 +11,14 @@ export interface SocialPlatform {
   icon: React.ReactNode;
 }
 
+const HANDLE_HINT: Record<string, { placeholder: string; type: string; inputMode?: "tel" | "text" }> = {
+  X: { placeholder: "@username", type: "text" },
+  Facebook: { placeholder: "Username or name", type: "text" },
+  Instagram: { placeholder: "@username", type: "text" },
+  WhatsApp: { placeholder: "Phone number", type: "tel", inputMode: "tel" },
+  Telegram: { placeholder: "@username", type: "text" },
+};
+
 export const SOCIAL_PLATFORMS: SocialPlatform[] = [
   {
     id: "X",
@@ -69,6 +77,8 @@ export const SocialSelection: React.FC = () => {
   const {
     selectedSocials,
     toggleSocial,
+    socialHandles,
+    setSocialHandle,
     selectAllSocials,
     clearSocials,
     setStep,
@@ -158,6 +168,18 @@ export const SocialSelection: React.FC = () => {
                 >
                   {platform.tagline}
                 </p>
+                {isSelected && (
+                  <input
+                    type={HANDLE_HINT[platform.id]?.type || "text"}
+                    inputMode={HANDLE_HINT[platform.id]?.inputMode}
+                    value={socialHandles[platform.id] || ""}
+                    onChange={(e) => setSocialHandle(platform.id, e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                    placeholder={HANDLE_HINT[platform.id]?.placeholder || "Username"}
+                    maxLength={40}
+                    className="mt-3 w-full rounded-lg bg-white/10 border border-white/30 text-[#FAF8F5] placeholder:text-[#FAF8F5]/50 px-3 py-2 text-sm focus:outline-none focus:border-nordic-accent"
+                  />
+                )}
               </div>
             </div>
           );
