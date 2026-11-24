@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowRight, Check, MessageCircle, Send } from "lucide-react";
+import { ArrowRight, Check, Send } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { useExperienceStore } from "../store/experienceStore";
 import { sounds } from "../utils/audio";
@@ -63,7 +63,11 @@ export const SOCIAL_PLATFORMS: SocialPlatform[] = [
     id: "WhatsApp",
     name: "WhatsApp",
     tagline: "Private chats & location sharing",
-    icon: <MessageCircle size={24} strokeWidth={1.75} />,
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current" aria-hidden="true">
+        <path d="M12.031 2c-5.516 0-9.969 4.453-9.969 9.969 0 1.766.469 3.484 1.344 5l-1.406 5.156 5.281-1.391c1.469.797 3.109 1.219 4.75 1.219 5.516 0 9.969-4.453 9.969-9.969S17.547 2 12.031 2zm5.813 14.078c-.25.703-1.438 1.344-1.984 1.422-.5.078-1.141.109-1.844-.109-.438-.141-.984-.328-1.688-.641-2.969-1.281-4.906-4.281-5.047-4.469-.156-.203-1.203-1.609-1.203-3.063 0-1.453.766-2.172 1.031-2.469.281-.297.609-.375.813-.375.203 0 .406 0 .578.016.188.016.438-.078.688.516.25.609.859 2.094.938 2.25.078.156.125.328.031.531-.109.203-.156.328-.313.5-.156.172-.313.391-.453.531-.156.141-.313.297-.141.594.188.297.797 1.313 1.719 2.125 1.188 1.047 2.172 1.375 2.484 1.531.297.141.469.125.641-.078.188-.203.75-.875.953-1.172.203-.297.406-.25.688-.156.281.109 1.781.844 2.094 1 .313.156.516.234.594.359.078.125.078.734-.172 1.438z" />
+      </svg>
+    ),
   },
   {
     id: "Telegram",
