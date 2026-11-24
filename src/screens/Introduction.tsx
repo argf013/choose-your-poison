@@ -38,6 +38,7 @@ export const Introduction: React.FC = () => {
           src={VIDEO_URL}
           className="w-full h-full object-cover"
           autoPlay
+          loop
           playsInline
           muted={!audioEnabled}
           onTimeUpdate={(e) => {
