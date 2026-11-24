@@ -1,6 +1,6 @@
 import React from "react";
 import { ReceiptData } from "../../types";
-import { SOCIAL_COPY, SIDE_DISH_COPY, socialLogoDataUrl } from "../../data/receiptCopy";
+import { SIDE_DISH_COPY, socialLogoDataUrl } from "../../data/receiptCopy";
 
 interface ThermalReceiptProps {
   receipt: ReceiptData;
@@ -80,20 +80,15 @@ export const ThermalReceipt: React.FC<ThermalReceiptProps> = ({
         {(receipt.selectedSocials || []).length === 0 && (
           <div className="text-xs text-neutral-500">-</div>
         )}
-        <div className="space-y-3">
+        <div className="flex flex-row flex-wrap items-center justify-center gap-3">
           {(receipt.selectedSocials || []).map((id) => {
-            const copy = SOCIAL_COPY[id];
             const logo = socialLogoDataUrl(id, 96);
-            return (
-              <div key={id} className="flex flex-col items-center">
-                {logo && <img src={logo} alt={id} className="w-9 h-9 mb-1" />}
-                <div className="text-[11px] font-bold uppercase">{copy?.name || id}</div>
-                {copy && (
-                  <div className="text-[10px] text-neutral-700 leading-snug mt-0.5">
-                    {copy.description}
-                  </div>
-                )}
-              </div>
+            return logo ? (
+              <img key={id} src={logo} alt={id} title={id} className="w-6 h-6" />
+            ) : (
+              <span key={id} className="text-[10px] font-bold uppercase">
+                {id}
+              </span>
             );
           })}
         </div>

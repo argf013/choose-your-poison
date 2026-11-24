@@ -2,29 +2,6 @@
  * Copy and logos used on the printed receipt (preview + ESC/POS).
  */
 
-export const SOCIAL_COPY: Record<string, { name: string; description: string }> = {
-  X: {
-    name: "X",
-    description: "A place for short public posts. Anyone can read what you write.",
-  },
-  Facebook: {
-    name: "Facebook",
-    description: "Keeps your friends, family and life updates in one place.",
-  },
-  Instagram: {
-    name: "Instagram",
-    description: "An app for sharing photos and videos. Anything you post can be seen by a lot of people.",
-  },
-  WhatsApp: {
-    name: "WhatsApp",
-    description: "Private chats that often include your phone number and location.",
-  },
-  Telegram: {
-    name: "Telegram",
-    description: "Chats, groups and channels, with messages stored in the cloud.",
-  },
-};
-
 /** Monochrome SVG inner markup (24x24 viewBox) per platform. */
 const LOGO_INNER: Record<string, { fill: boolean; inner: string }> = {
   X: {

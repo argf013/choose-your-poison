@@ -1,5 +1,5 @@
 import { ReceiptData } from "../types";
-import { SOCIAL_COPY, SIDE_DISH_COPY, socialLogoDataUrl } from "../data/receiptCopy";
+import { SIDE_DISH_COPY, socialLogoDataUrl } from "../data/receiptCopy";
 
 /**
  * ESC/POS Command Byte Constants
@@ -279,6 +279,39 @@ export class EscPosBuilder {
 }
 
 /**
+ * Compose platform logos into one horizontal strip (PNG data URL) so they
+ * print side by side on a single raster row.
+ */
+async function buildLogoRowDataUrl(ids: string[], size = 56, gap = 16): Promise<string | null> {
+  const urls = ids.map((id) => socialLogoDataUrl(id, size * 2)).filter((u): u is string => !!u);
+  if (urls.length === 0) return null;
+  const imgs = await Promise.all(
+    urls.map(
+      (u) =>
+        new Promise<HTMLImageElement>((resolve, reject) => {
+          const im = new Image();
+          im.onload = () => resolve(im);
+          im.onerror = reject;
+          im.src = u;
+        })
+    )
+  );
+  const rawWidth = imgs.length * size + (imgs.length - 1) * gap;
+  const width = Math.ceil(rawWidth / 8) * 8;
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, width, size);
+  ctx.imageSmoothingQuality = "high";
+  const startX = Math.floor((width - rawWidth) / 2);
+  imgs.forEach((im, i) => ctx.drawImage(im, startX + i * (size + gap), 0, size, size));
+  return canvas.toDataURL("image/png");
+}
+
+/**
  * Generate complete ESC/POS buffer from ReceiptData
  */
 export async function generateEscPosReceipt(receipt: ReceiptData): Promise<Uint8Array> {
@@ -307,19 +340,17 @@ export async function generateEscPosReceipt(receipt: ReceiptData): Promise<Uint8
   if (socials.length === 0) {
     builder.line("-");
   }
-  for (const id of socials) {
-    const copy = SOCIAL_COPY[id];
-    const logo = socialLogoDataUrl(id, 96);
-    if (logo) {
-      try {
-        await builder.rasterImage(logo, 96);
-      } catch {
-        // skip logo, name below still prints
+  if (socials.length > 0) {
+    try {
+      const row = await buildLogoRowDataUrl(socials);
+      if (row) {
+        await builder.rasterImage(row);
+      } else {
+        builder.line(socials.join(" | "));
       }
+    } catch {
+      builder.line(socials.join(" | "));
     }
-    builder.bold(true).line((copy?.name || id).toUpperCase()).bold(false);
-    if (copy) builder.wrappedText(copy.description, 0);
-    builder.feed(1);
   }
   builder.divider();
 
