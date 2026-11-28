@@ -18,7 +18,9 @@ export const ExpressionInputModal: React.FC<ExpressionInputModalProps> = ({
   // Camera state for share-face
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const countdownTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   // Local form states
   const [mindText, setMindText] = useState(expressionInputs.mindText || "");
@@ -39,6 +41,11 @@ export const ExpressionInputModal: React.FC<ExpressionInputModalProps> = ({
 
   // Stop camera helper
   const stopCamera = () => {
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+    setCountdown(null);
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
@@ -117,6 +124,25 @@ export const ExpressionInputModal: React.FC<ExpressionInputModalProps> = ({
     }
   };
 
+  const handleStartCountdown = () => {
+    if (countdown !== null) return;
+    let remaining = 3;
+    setCountdown(remaining);
+    countdownTimerRef.current = setInterval(() => {
+      remaining -= 1;
+      if (remaining <= 0) {
+        if (countdownTimerRef.current) {
+          clearInterval(countdownTimerRef.current);
+          countdownTimerRef.current = null;
+        }
+        setCountdown(null);
+        handleCapturePhoto();
+      } else {
+        setCountdown(remaining);
+      }
+    }, 1000);
+  };
+
   const handleRetakePhoto = () => {
     updateExpressionInputs({ facePhoto: undefined });
     startCamera();
@@ -183,20 +209,30 @@ export const ExpressionInputModal: React.FC<ExpressionInputModalProps> = ({
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full max-h-72 object-cover rounded-xl bg-black border border-nordic-border"
-                  />
+                  <div className="relative">
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      muted
+                      className="w-full max-h-72 object-cover rounded-xl bg-black border border-nordic-border"
+                    />
+                    {countdown !== null && (
+                      <div className="absolute inset-0 rounded-xl bg-black/45 flex items-center justify-center">
+                        <span className="text-7xl font-bold text-white drop-shadow-lg animate-pulse">
+                          {countdown}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                   <Button
                     variant="primary"
                     size="md"
+                    disabled={countdown !== null}
                     icon={<Camera size={16} />}
-                    onClick={handleCapturePhoto}
+                    onClick={handleStartCountdown}
                   >
-                    Take Photo
+                    {countdown !== null ? `Taking photo in ${countdown}...` : "Take Photo (3s)"}
                   </Button>
                 </div>
               )}
