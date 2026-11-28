@@ -155,6 +155,9 @@ export const ExpressionInputModal: React.FC<ExpressionInputModalProps> = ({
     canvas.height = video.videoHeight || 480;
     const ctx = canvas.getContext("2d");
     if (ctx) {
+      // Un-mirror front-facing camera capture
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
       updateExpressionInputs({ facePhoto: dataUrl });
@@ -253,7 +256,7 @@ export const ExpressionInputModal: React.FC<ExpressionInputModalProps> = ({
                       autoPlay
                       playsInline
                       muted
-                      className="w-full max-h-72 object-cover rounded-xl bg-black border border-nordic-border"
+                      className="w-full max-h-72 object-cover rounded-xl bg-black border border-nordic-border -scale-x-100"
                     />
                     {countdown !== null && (
                       <div className="absolute inset-0 rounded-xl bg-black/45 flex items-center justify-center">
