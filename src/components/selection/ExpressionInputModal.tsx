@@ -126,7 +126,7 @@ export const ExpressionInputModal: React.FC<ExpressionInputModalProps> = ({
 
   const handleStartCountdown = () => {
     if (countdown !== null) return;
-    let remaining = 3;
+    let remaining = 5;
     setCountdown(remaining);
     countdownTimerRef.current = setInterval(() => {
       remaining -= 1;
@@ -232,7 +232,7 @@ export const ExpressionInputModal: React.FC<ExpressionInputModalProps> = ({
                     icon={<Camera size={16} />}
                     onClick={handleStartCountdown}
                   >
-                    {countdown !== null ? `Taking photo in ${countdown}...` : "Take Photo (3s)"}
+                    {countdown !== null ? `Taking photo in ${countdown}...` : "Take Photo (5s)"}
                   </Button>
                 </div>
               )}
