@@ -9,7 +9,10 @@ const cache = new Map<string, Promise<string | null>>();
 
 export function parseCoords(text?: string): { lat: number; lng: number } | null {
   if (!text) return null;
-  const m = text.trim().match(/^(-?\d+(?:\.\d+)?)\s*[,;\s]\s*(-?\d+(?:\.\d+)?)$/);
+  const trimmed = text.trim();
+  const m =
+    trimmed.match(/^(-?\d+(?:\.\d+)?)\s*[,;\s]\s*(-?\d+(?:\.\d+)?)$/) ||
+    trimmed.match(/\((-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\)\s*$/);
   if (!m) return null;
   const lat = parseFloat(m[1]);
   const lng = parseFloat(m[2]);
